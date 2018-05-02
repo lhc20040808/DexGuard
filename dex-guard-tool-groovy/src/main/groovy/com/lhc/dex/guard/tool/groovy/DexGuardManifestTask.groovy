@@ -5,7 +5,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
 class DexGuardManifestTask extends DefaultTask {
-    def static final KEY = "guard_key"
+    def static final KEY = "app_name"
     File manifest
 
     DexGuardManifestTask() {
@@ -18,16 +18,16 @@ class DexGuardManifestTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        String key = project.extensions.dexGuard.key
-        if (key == null || key.isEmpty()) {
+        String applicationName = project.extensions.dexGuard.application
+        if (applicationName == null || applicationName.isEmpty()) {
             return
         }
 
-        project.logger.quiet("DexGuard:插入${key}")
+        project.logger.quiet("DexGuard:插入${applicationName}")
         def ns = new Namespace('http://schemas.android.com/apk/res/android', 'android')
         def xml = new XmlParser().parse(manifest)
-        Node application = xml.application[0]
-        def metaDataTag = application['meta-data']
+        Node applicationNode = xml.application[0]
+        def metaDataTag = applicationNode['meta-data']
         metaDataTag.findAll {
             Node node ->
                 node.attributes()[ns.name] == KEY
@@ -36,7 +36,7 @@ class DexGuardManifestTask extends DefaultTask {
                 node.parent().remove(node)
         }
 
-        application.appendNode('meta-data', [(ns.name): KEY, (ns.value): key])
+        applicationNode.appendNode('meta-data', [(ns.name): KEY, (ns.value): applicationName])
         def pm = new XmlNodePrinter(new PrintWriter(manifest, "UTF-8"))
         pm.print(xml)
     }

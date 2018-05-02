@@ -5,4 +5,6 @@ class DexGuardExtension{
 
     def key
 
+    def application
+
 }

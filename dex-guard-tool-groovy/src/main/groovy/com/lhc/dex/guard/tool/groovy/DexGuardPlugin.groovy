@@ -1,6 +1,7 @@
 package com.lhc.dex.guard.tool.groovy
 
 import com.android.build.gradle.api.ApplicationVariant
+import com.android.builder.model.AndroidProject
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -25,7 +26,7 @@ class DexGuardPlugin implements Plugin<Project> {
             project.android.applicationVariants.all {
                 ApplicationVariant variant ->
                     String taskName = "${variant.flavorName.capitalize()}${variant.buildType.name.capitalize()}"
-                    //任务1：向manifest中插入一条meta-data，保存密钥
+                    //任务1：向manifest中插入一条meta-data，保存原application
                     DexGuardManifestTask manifestTask = project.tasks.create("dexGuardManifest${taskName}", DexGuardManifestTask)
                     def manifestFile = variant.outputs.first().processManifest.manifestOutputDirectory.listFiles().find {
                         File file ->
@@ -37,13 +38,18 @@ class DexGuardPlugin implements Plugin<Project> {
                     variant.outputs.first().processResources.dependsOn manifestTask
 
                     //任务2:加密任务
-//                    DexEncryptTask dexEncryptTask = project.tasks.create("dexEncrypt${taskName}", DexEncryptTask)
-//                    dexEncryptTask.aarFile = aarFile
-//                    dexEncryptTask.apkFile = variant.outputs.first().outputFile//拿到APK文件
-//                    String path = "${project.buildDir}/${AndroidProject.FD_OUTPUTS}/temp"
-//                    project.logger.quiet("解压路径:${path}")
-//                    dexEncryptTask.outputs.file("${path}")
-//                    dexEncryptTask.baseName = "${project.name}-${variant.baseName}"
+                    DexEncryptTask dexEncryptTask = project.tasks.create("dexEncrypt${taskName}", DexEncryptTask)
+                    dexEncryptTask.aarFile = aarFile
+                    dexEncryptTask.apkFile = variant.outputs.first().outputFile//拿到APK文件
+                    String path = "${project.buildDir}/${AndroidProject.FD_OUTPUTS}/temp"
+                    project.logger.quiet("解压路径:${path}")
+                    dexEncryptTask.outputs.file("${path}")
+                    dexEncryptTask.baseName = "${project.name}-${variant.baseName}"
+
+                    def assembleTask = project.tasks.getByName("assemble${taskName}")
+                    def packageTask = project.tasks.getByName("package${taskName}")
+                    assembleTask.dependsOn dexEncryptTask//assemble依赖加密任务
+                    dexEncryptTask.mustRunAfter packageTask
             }
         }
     }

@@ -10,8 +10,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -162,34 +160,20 @@ public class ProxyApplication extends Application {
 
         //获得系统classLoader中dexElement数组
         try {
-            ClassLoader classLoader = getClassLoader();
-            //获取ClassLoader中的pathList#DexPathList
-            Field pathListField = ReflectUtils.findField(classLoader, "pathList");
-            Object pathList = pathListField.get(classLoader);
-            //获取pathList中的dexElements#Element[]
-            Field dexElementsField = ReflectUtils.findField(pathList, "dexElements");
-            Object[] dexElements = (Object[]) dexElementsField.get(pathList);
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                //[4.0-5.0)
 
-            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                //[5.0-6.0)
-                //private static Element[] makeDexElements(ArrayList<File> files, File optimizedDirectory,ArrayList<IOException> suppressedExceptions)
-                Method makeDexElementsMethod = ReflectUtils.findMethod(pathList, "makeDexElements", ArrayList.class, File.class, ArrayList.class);
-                ArrayList<IOException> suppressedExceptions = new ArrayList<IOException>();
-                Object[] addElements = (Object[]) makeDexElementsMethod.invoke(pathList, dexFiles, optimizedDirectory, suppressedExceptions);
-                //DexElements数组融合
-                Object[] newElements = (Object[]) Array.newInstance(dexElements.getClass().getComponentType(), dexElements.length + addElements.length);
-                System.arraycopy(dexElements, 0, newElements, 0, dexElements.length);
-                System.arraycopy(addElements, 0, newElements, dexElements.length, addElements.length);
-
-                dexElementsField.set(pathList, newElements);
-            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                //[6.0-7.0)
-            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                //[7.0-8.0)
-            } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                //8.0+
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                //7.0+
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                //6.0+
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                //5.0+
+                DexInstall.V21.install(this, dexFiles, optimizedDirectory);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                //4.0+
+            } else {
 
             }
 
@@ -203,6 +187,7 @@ public class ProxyApplication extends Application {
             e.printStackTrace();
         }
     }
+
 
     @Override
     public Context createPackageContext(String packageName, int flags) throws PackageManager.NameNotFoundException {

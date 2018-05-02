@@ -13,6 +13,14 @@ class DexEncryptTask extends DefaultTask {
     DexEncryptTask() {
         group = 'dexGuard'
         description = '加密Dex'
+
+        String key = project.dexGuard.key
+        if (key != null && !key.isEmpty()) {
+            AES.init(key)
+        } else {
+            AES.init(AES.DEFAULT_PWD)
+        }
+
         outputs.upToDateWhen {
             false
         }
@@ -29,10 +37,16 @@ class DexEncryptTask extends DefaultTask {
             if (it.name == 'classes.jar') {
                 clzJar = it
             } else {
-                it.delete()
+                if (it.directory) {
+                    it.deleteDir()
+                } else {
+                    it.delete()
+                }
             }
         }
-        File aarDex = "${outDir.absolutePath}/classes.dex"
+
+        //将jar转换成dex
+        File aarDex = new File("${outDir.absolutePath}/classes.dex")
         def result = "./dx --dex --output ${aarDex} ${clzJar}".execute()
         def out = new StringBuffer()
         def err = new StringBuffer()
@@ -42,8 +56,23 @@ class DexEncryptTask extends DefaultTask {
             throw new GradleException("Jar to Dex 执行失败")
         }
 
-        def apkFile = new File(baseName)
-        ZipUtils.unZip(apkFile, outDir)
+        //解压apk
+        def unzipFile = new File(outDir, baseName)
+        ZipUtils.unZip(apkFile, unzipFile)
+
+        def dexFiles = unzipFile.listFiles().findAll {
+            it.name.endsWith(".dex")
+        }
+
+        //对原始的dex加密
+        dexFiles.each {
+            def encryptData = AES.encrypt(it.bytes)
+            it.withOutputStream {
+                it.write(encryptData)
+            }
+            it.renameTo("secret-${it.name}")
+        }
+
     }
 
 }
