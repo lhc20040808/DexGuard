@@ -16,8 +16,8 @@ publishing{
     publications{
         DexGuardPlugin(MavenPublication){
             from components.java
-            group 'com.lhc.dexguard.tool.groovy'
-            artifactId 'DexGuard'
+            groupId 'com.lhc.dexguard.tool.groovy'
+            artifactId 'plugin'
             version '1.0'
         }
     }

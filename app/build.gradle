@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'com.lhc.dex.guard.tool.groovy'
+apply plugin: 'com.lhc.dexguard.tool.groovy'
 
 android {
     compileSdkVersion 26
