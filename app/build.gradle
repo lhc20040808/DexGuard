@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'com.lhc.dexguard.tool.groovy'
+apply plugin: 'com.lhc.dexguard.tool.groovy'
 
 android {
     compileSdkVersion 26
@@ -19,9 +19,9 @@ android {
     }
 }
 
-//dexGuard{
-//    key 'abcdefghijklmnop'
-//}
+dexGuard{
+    key 'abcdefghijklmnop'
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

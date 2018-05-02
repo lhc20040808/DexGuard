@@ -5,7 +5,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 class DexEncryptTask extends DefaultTask {
-
+    def clzDex = "classes.dex"
     File apkFile
     File aarFile
     String baseName
@@ -46,7 +46,7 @@ class DexEncryptTask extends DefaultTask {
         }
 
         //将jar转换成dex
-        File aarDex = new File("${outDir.absolutePath}/classes.dex")
+        File aarDex = new File("${outDir.absolutePath}/${clzDex}")
         def result = "./dx --dex --output ${aarDex} ${clzJar}".execute()
         def out = new StringBuffer()
         def err = new StringBuffer()
@@ -57,22 +57,22 @@ class DexEncryptTask extends DefaultTask {
         }
 
         //解压apk
-        def unzipFile = new File(outDir, baseName)
-        ZipUtils.unZip(apkFile, unzipFile)
+        def unZipApkFile = new File(outDir, baseName)
+        ZipUtils.unZip(apkFile, unZipApkFile)
 
-        def dexFiles = unzipFile.listFiles().findAll {
+        def dexFiles = unZipApkFile.listFiles().findAll {
             it.name.endsWith(".dex")
         }
 
-        //对原始的dex加密
         dexFiles.each {
             def encryptData = AES.encrypt(it.bytes)
             it.withOutputStream {
                 it.write(encryptData)
             }
-            it.renameTo("secret-${it.name}")
+            it.renameTo(new File(unZipApkFile, "secret-${it.name}"))
         }
-
+        //把dex文件拷贝到apk解压缩的目录
+        aarDex.renameTo(new File(unZipApkFile, clzDex))
     }
 
 }
