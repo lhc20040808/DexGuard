@@ -21,8 +21,14 @@ class DexGuardPlugin implements Plugin<Project> {
                 ApplicationVariant variant ->
                     //任务1：向manifest中插入一条meta-data，保存密钥
                     DexGuardManifestTask manifestTask = project.tasks.create("dexGuardManifest${variant.flavorName.capitalize()}${variant.buildType.name.capitalize()}", DexGuardManifestTask)
-                    def manifestFile = variant.outputs.first().processResources.manifestFile
+                    def manifestFile = variant.outputs.first().processManifest.manifestOutputDirectory.listFiles().find{
+                        File file ->
+                            file.name == "AndroidManifest.xml"
+                    }
                     manifestTask.manifest = manifestFile
+                    //已经存在Manifest文件并且在打包前执行任务
+                    manifestTask.mustRunAfter variant.outputs.first().processManifest
+                    variant.outputs.first().processResources.dependsOn manifestTask
             }
         }
 

@@ -1,6 +1,6 @@
 package com.lhc.dex.guard.tool.groovy
 
-import groovyjarjarantlr.NameSpace
+import groovy.xml.Namespace
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
@@ -24,7 +24,7 @@ class DexGuardManifestTask extends DefaultTask {
         }
 
         project.logger.quiet("DexGuard:插入${key}")
-        def ns = new NameSpace('http://schemas.android.com/apk/res/android', 'android')
+        def ns = new Namespace('http://schemas.android.com/apk/res/android', 'android')
         def xml = new XmlParser().parse(manifest)
         Node application = xml.application[0]
         def metaDataTag = application['meta-data']
