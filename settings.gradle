@@ -1,1 +1,1 @@
-include ':app', ':dex-guard-core', ':dex-guard-tool-java'
+include ':app', ':dex-guard-core', ':dex-guard-tool-java',':dex-guard-tool-groovy'

@@ -1,0 +1,24 @@
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+dependencies{
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.tools.build:gradle:3.0.1'
+    implementation localGroovy()
+    implementation gradleApi()
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
+
+publishing{
+    publications{
+        DexGuardPlugin(MavenPublication){
+            from components.java
+            group 'com.lhc.dexguard.tool.groovy'
+            artifactId 'DexGuard'
+            version '1.0'
+        }
+    }
+}

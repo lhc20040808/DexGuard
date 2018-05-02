@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/dex-guard-core" />
+            <option value="$PROJECT_DIR$/dex-guard-tool-groovy" />
             <option value="$PROJECT_DIR$/dex-guard-tool-java" />
           </set>
         </option>

@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/DexGuard.iml" filepath="$PROJECT_DIR$/DexGuard.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/dex-guard-core/dex-guard-core.iml" filepath="$PROJECT_DIR$/dex-guard-core/dex-guard-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dex-guard-tool-groovy/dex-guard-tool-groovy.iml" filepath="$PROJECT_DIR$/dex-guard-tool-groovy/dex-guard-tool-groovy.iml" />
       <module fileurl="file://$PROJECT_DIR$/dex-guard-tool-java/dex-guard-tool-java.iml" filepath="$PROJECT_DIR$/dex-guard-tool-java/dex-guard-tool-java.iml" />
     </modules>
   </component>
